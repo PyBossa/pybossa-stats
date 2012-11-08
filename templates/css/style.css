@@ -1,0 +1,50 @@
+html, body {
+    font-family: 'Source Sans Pro', sans-serif !important;
+    background-image: url('img/navy_blue.png');
+    color: rgb(221, 221, 221);
+}
+
+h1, h2, h3, p, text {
+    font-weight: 200 !important;
+}
+
+
+
+.img-polaroid {
+    padding: 1px !important;
+}
+
+#heading {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#heading h1 {
+    color:rgb(221,221,221);
+    font-size: 52px !important;
+}
+
+#heading h1 small {
+    font-size: 50px !important;
+}
+
+#card {
+    color: black;
+}
+
+#card h2 {
+    font-size:40px;
+    font-height:42px;
+}
+
+#dist-answers p, #dist-auth p, #dist-anon p {
+    font-size: 22px;
+}
+
+#dist-auth ul > li, #dist-anon ul > li {
+    font-size: 16px;
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+    background-color: rgb(200,200,200) !important;
+}
