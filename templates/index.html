@@ -24,7 +24,8 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
         <script src="http://d3js.org/d3.v2.js"></script>
         <script>
-        {% include "js/nv.d3.min.js" %}
+        {% include "js/flotr2.min.js" %}
+        {% include "js/underscore-min.js" %}
         </script>
         <script src="Stats.json"></script>
         <script>
@@ -61,33 +62,50 @@
             <div id="card" class="row-fluid">
                 <div class="span12  well">
                     <h2>Distribution of Answers per Hour</h2>
-                    <div id="hourStats" style="margin:0">
-                    <svg style="height:500px;"></svg>
+                    <div id="hourStats" style="margin:0;height:500px;">
                     </div>
                     <script>
-                    nv.addGraph(function() {
-                      var data = appStats.hourStats;
-                      var chart = nv.models.scatterChart()
-                                    .showDistX(true)
-                                    .showDistY(true)
-                                    .color(d3.scale.category10().range());
-                    
-                      chart.xAxis
-                        .axisLabel('Hours')
-                        .tickFormat(d3.format('i'));
-                      chart.yAxis
-                        .axisLabel('Answers')
-                        .tickFormat(d3.format('s'));
-                    
-                       d3.select('#hourStats svg')
-                          .datum(data)
-                        .transition().duration(500)
-                          .call(chart);
-                    
-                      nv.utils.windowResize(chart.update);
-                    
-                      return chart;
+                    function answersPerHour(obj) {
+                        return (parseInt(obj.y) + " answers were submitted at " + parseInt(obj.x) + " hours");
+                    }
+
+                    function hours(obj) {
+                        return (parseInt(obj) + ":00");
+                    }
+                    var container = document.getElementById('hourStats');
+                    var graph = Flotr.draw(container, [{data: appStats.hourStats[1]['values'], label:appStats.hourStats[1]['label']},{ data:appStats.hourStats[2]['values'],label:appStats.hourStats[2]['label'] }], {
+                        bubbles : {show: true, baseRadius:5},
+                        xaxis   : {min: 0, max:24, tickFormatter: hours},
+                        yaxis   : {min: 0, max:_.max(appStats.hourStats[0])},
+                        mouse   : {track: true, trackFormatter: answersPerHour},
+                        HtmlText: false,
+                        legend  : {postion: 'nw'}
                     });
+                    console.log(_.max(appStats.hourStats[0]));
+                    console.log((appStats.hourStats[0].max));
+                    //nv.addGraph(function() {
+                    //  var data = appStats.hourStats;
+                    //  var chart = nv.models.scatterChart()
+                    //                .showDistX(true)
+                    //                .showDistY(true)
+                    //                .color(d3.scale.category10().range());
+                    //
+                    //  chart.xAxis
+                    //    .axisLabel('Hours')
+                    //    .tickFormat(d3.format('i'));
+                    //  chart.yAxis
+                    //    .axisLabel('Answers')
+                    //    .tickFormat(d3.format('s'));
+                    //
+                    //   d3.select('#hourStats svg')
+                    //      .datum(data)
+                    //    .transition().duration(500)
+                    //      .call(chart);
+                    //
+                    //  nv.utils.windowResize(chart.update);
+                    //
+                    //  return chart;
+                    //});
                     </script>
                 </div>
             </div>
@@ -101,49 +119,49 @@
                     <svg style="height:400px;"></svg>
                     </div>
                     <script>
-                        nv.addGraph(function() {
-                            var data = appStats.dayStats;
-                            var chart = nv.models.lineWithFocusChart()
-                                  .margin({top: 30, right: 35, bottom: 50, left: 35})
-                                  .x(function(d,i) { return i })
-                                  .y(function(d) { return d[1] })
-                                  .color(d3.scale.category10().range());
-                        
-                            chart.xAxis
-                              .showMaxMin(true)
-                              .axisLabel('Days')
-                              .tickFormat(function(d) {
-                                var dx = data[0].values[d] && data[0].values[d][0] || 0;
-                                if (dx!=0) {
-                                    return d3.time.format('%y-%m-%d')(new Date(dx))
-                                }
-                              });
+                        //nv.addGraph(function() {
+                        //    var data = appStats.dayStats;
+                        //    var chart = nv.models.lineWithFocusChart()
+                        //          .margin({top: 30, right: 35, bottom: 50, left: 35})
+                        //          .x(function(d,i) { return i })
+                        //          .y(function(d) { return d[1] })
+                        //          .color(d3.scale.category10().range());
+                        //
+                        //    chart.xAxis
+                        //      .showMaxMin(true)
+                        //      .axisLabel('Days')
+                        //      .tickFormat(function(d) {
+                        //        var dx = data[0].values[d] && data[0].values[d][0] || 0;
+                        //        if (dx!=0) {
+                        //            return d3.time.format('%y-%m-%d')(new Date(dx))
+                        //        }
+                        //      });
 
-                            chart.x2Axis
-                              .showMaxMin(true)
-                              .tickFormat(function(d) {
-                                var dx = data[0].values[d] && data[0].values[d][0] || 0;
-                                if (dx!=0) {
-                                    return d3.time.format('%y-%m-%d')(new Date(dx))
-                                }
-                              });
+                        //    chart.x2Axis
+                        //      .showMaxMin(true)
+                        //      .tickFormat(function(d) {
+                        //        var dx = data[0].values[d] && data[0].values[d][0] || 0;
+                        //        if (dx!=0) {
+                        //            return d3.time.format('%y-%m-%d')(new Date(dx))
+                        //        }
+                        //      });
 
 
-                            chart.yAxis
-                                .axisLabel('Answers')
-                                .tickFormat(d3.format(',s'));
-                        
-                            chart.y2Axis
-                                .tickFormat(d3.format(',s'));
-                        
-                            d3.select('#dayStats svg')
-                                .datum(data)
-                              .transition().duration(500).call(chart);
-                        
-                            nv.utils.windowResize(chart.update);
-                        
-                            return chart;
-                        });
+                        //    chart.yAxis
+                        //        .axisLabel('Answers')
+                        //        .tickFormat(d3.format(',s'));
+                        //
+                        //    chart.y2Axis
+                        //        .tickFormat(d3.format(',s'));
+                        //
+                        //    d3.select('#dayStats svg')
+                        //        .datum(data)
+                        //      .transition().duration(500).call(chart);
+                        //
+                        //    nv.utils.windowResize(chart.update);
+                        //
+                        //    return chart;
+                        //});
                     </script>
                 </div>
             </div>
@@ -178,24 +196,24 @@
                             <svg style='height:250px;width:250px'></svg>
                         </div>
                         <script>
-                            nv.addGraph(function() {
-                                var chart = nv.models.pieChart()
-                                    .color(d3.scale.category10().range().slice(1,3))
-                                .margin({top:-60})
-                                    .x(function(d) { return d.label })
-                                    .y(function(d) { return d.value })
-                                    .showLabels(true)
-                                    .showLegend(false)
-                                    .labelThreshold(.05)
-                                    .donut(true);
+                            //nv.addGraph(function() {
+                            //    var chart = nv.models.pieChart()
+                            //        .color(d3.scale.category10().range().slice(1,3))
+                            //    .margin({top:-60})
+                            //        .x(function(d) { return d.label })
+                            //        .y(function(d) { return d.value })
+                            //        .showLabels(true)
+                            //        .showLegend(false)
+                            //        .labelThreshold(.05)
+                            //        .donut(true);
 
-                                d3.select("#userAnsStats svg")
-                                    .datum([appStats.userStats])
-                                    .transition().duration(12000)
-                                    .call(chart);
+                            //    d3.select("#userAnsStats svg")
+                            //        .datum([appStats.userStats])
+                            //        .transition().duration(12000)
+                            //        .call(chart);
 
-                              nv.utils.windowResize(chart.update);
-                              return chart;
+                            //  nv.utils.windowResize(chart.update);
+                            //  return chart;
                             });
                         </script>
                     </div>
@@ -238,24 +256,24 @@
                             <svg style='height:400px;width:400px'></svg>
                         </div>
                         <script>
-                            nv.addGraph(function() {
-                                var chart = nv.models.pieChart()
-                                    .color(d3.scale.category20().range())
-                                .margin({top:-60})
-                                    .x(function(d) { return d.label })
-                                    .y(function(d) { return d.value })
-                                    .showLabels(false)
-                                    .showLegend(false)
-                                    .labelThreshold(.05)
-                                    .donut(true);
+                            //nv.addGraph(function() {
+                            //    var chart = nv.models.pieChart()
+                            //        .color(d3.scale.category20().range())
+                            //    .margin({top:-60})
+                            //        .x(function(d) { return d.label })
+                            //        .y(function(d) { return d.value })
+                            //        .showLabels(false)
+                            //        .showLegend(false)
+                            //        .labelThreshold(.05)
+                            //        .donut(true);
 
-                                d3.select("#userStats svg")
-                                    .datum([appStats.userAnonStats])
-                                    .transition().duration(12000)
-                                    .call(chart);
+                            //    d3.select("#userStats svg")
+                            //        .datum([appStats.userAnonStats])
+                            //        .transition().duration(12000)
+                            //        .call(chart);
 
-                              nv.utils.windowResize(chart.update);
-                              return chart;
+                            //  nv.utils.windowResize(chart.update);
+                            //  return chart;
                             });
                         </script>
                     </div>
@@ -264,27 +282,27 @@
                             <div id="map" style="height:250px;"></div>
                         </div>
                         <script>
-                            var map = L.map('map');
-                            map.fitWorld();
-                            map.setZoom(1);
-                            var url = 'http://{s}.tile.cloudmade.com/f9ed30886bf3454691669c63a45490f4/997/256/{z}/{x}/{y}.png'
-                            L.tileLayer(url, 
-                                {
-                                attribution: 'Map data Cloudmade.com &copy;',
-                                maxZoom: 18,
-                                minZoom:1
-                                }).addTo(map);
+                            //var map = L.map('map');
+                            //map.fitWorld();
+                            //map.setZoom(1);
+                            //var url = 'http://{s}.tile.cloudmade.com/f9ed30886bf3454691669c63a45490f4/997/256/{z}/{x}/{y}.png'
+                            //L.tileLayer(url, 
+                            //    {
+                            //    attribution: 'Map data Cloudmade.com &copy;',
+                            //    maxZoom: 18,
+                            //    minZoom:1
+                            //    }).addTo(map);
 
-                            var i = 0;
-                            var locations = appStats.userAnonStats.locs;
-                            var l = locations.length;
-                            var markers = new L.MarkerClusterGroup();
-                            for (i;i<l;i++) {
-                                var lat = parseFloat(locations[i].loc.latitude);
-                                var lng = parseFloat(locations[i].loc.longitude);
-                                markers.addLayer(L.marker([lat,lng]));
-                            }
-                            map.addLayer(markers);
+                            //var i = 0;
+                            //var locations = appStats.userAnonStats.locs;
+                            //var l = locations.length;
+                            //var markers = new L.MarkerClusterGroup();
+                            //for (i;i<l;i++) {
+                            //    var lat = parseFloat(locations[i].loc.latitude);
+                            //    var lng = parseFloat(locations[i].loc.longitude);
+                            //    markers.addLayer(L.marker([lat,lng]));
+                            //}
+                            //map.addLayer(markers);
 
                         </script>
                     </div>
@@ -323,26 +341,26 @@
                             <svg style='height:400px;width:400px'></svg>
                         </div>
                         <script>
-                            nv.addGraph(function() {
-                                var chart = nv.models.pieChart()
-                                    .color(d3.scale.category20().range())
-                                .margin({top:-60})
-                                    .x(function(d) { return d.label })
-                                    .y(function(d) { return d.value })
-                                    .showLabels(false)
-                                    .showLegend(false)
-                                    .labelThreshold(.05)
-                                    .donut(true);
+                            //nv.addGraph(function() {
+                            //    var chart = nv.models.pieChart()
+                            //        .color(d3.scale.category20().range())
+                            //    .margin({top:-60})
+                            //        .x(function(d) { return d.label })
+                            //        .y(function(d) { return d.value })
+                            //        .showLabels(false)
+                            //        .showLegend(false)
+                            //        .labelThreshold(.05)
+                            //        .donut(true);
 
-                                
-                                d3.select("#authStats svg")
-                                    .datum([appStats.userAuthStats])
-                                    .transition().duration(12000)
-                                    .call(chart);
+                            //    
+                            //    d3.select("#authStats svg")
+                            //        .datum([appStats.userAuthStats])
+                            //        .transition().duration(12000)
+                            //        .call(chart);
 
-                              nv.utils.windowResize(chart.update);
-                              return chart;
-                            });
+                            //  nv.utils.windowResize(chart.update);
+                            //  return chart;
+                            //});
                         </script>
                     </div>
                 </div>

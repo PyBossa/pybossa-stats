@@ -66,6 +66,10 @@ if __name__ == "__main__":
         hours = {}
         hours_anon = {}
         hours_auth = {}
+        max_hours = 0
+        max_hours_anon = 0
+        max_hours_auth = 0
+
         # initialize hours keys
         for i in range(0,24):
             hours[u'%s' % i]=0
@@ -107,14 +111,21 @@ if __name__ == "__main__":
 
                     # Hours
                     if hour in hours.keys():
-                        hours[hour] +=1
+                        hours[hour] += 1
+                        if (hours[hour] > max_hours):
+                            max_hours = hours[hour]
 
                     if tr.user_id is None:
                         if hour in hours_anon.keys():
                             hours_anon[hour] += 1
+                            if (hours_anon[hour] > max_hours_anon):
+                                max_hours_anon = hours_anon[hour]
+
                     else:
                         if hour in hours_auth.keys():
                             hours_auth[hour] += 1
+                            if (hours_auth[hour] > max_hours_auth):
+                                max_hours_auth = hours_auth[hour]
 
 
             offset = offset + 100
@@ -129,9 +140,9 @@ if __name__ == "__main__":
         dayNewAnonStats  = dict(key="Anonymous", values=[])
         dayNewAuthStats  = dict(key="Authenticated", values=[])
 
-        hourNewStats    = dict(key="Anon + Auth", disabled="True", values=[])
-        hourNewAnonStats  = dict(key="Anonymous", values=[])
-        hourNewAuthStats  = dict(key="Authenticated", values=[])
+        hourNewStats    = dict(label="Anon + Auth", disabled="True", values=[], max=0)
+        hourNewAnonStats  = dict(label="Anonymous", values=[], max=0)
+        hourNewAuthStats  = dict(label="Authenticated", values=[], max=0)
 
         total = 0
         import time
@@ -182,17 +193,32 @@ if __name__ == "__main__":
                         0])
 
         # Hours 
+        hourNewStats['max'] = max_hours
+        hourNewAnonStats['max'] = max_hours_anon
+        hourNewAuthStats['max'] = max_hours_auth
         for h in sorted(hours.keys()):
             # New answers per hour
-            hourNewStats['values'].append(dict(x=int(h), y=hours[h], size=hours[h]*10))
+            #hourNewStats['values'].append(dict(x=int(h), y=hours[h], size=hours[h]*10))
+            if (hours[h] != 0):
+                hourNewStats['values'].append([int(h), hours[h], (hours[h]*5)/max_hours])
+            else:
+                hourNewStats['values'].append([int(h), hours[h], 0])
 
             # New Anonymous answers per hour
             if h in hours_anon.keys():
-                hourNewAnonStats['values'].append(dict(x=int(h), y=hours[h], size=hours_anon[h]*10))
+                #hourNewAnonStats['values'].append(dict(x=int(h), y=hours[h], size=hours_anon[h]*10))
+                if (hours_anon[h] != 0):
+                    hourNewAnonStats['values'].append([int(h), hours_anon[h], (hours_anon[h]*5)/max_hours])
+                else:
+                    hourNewAnonStats['values'].append([int(h), hours_anon[h],0 ])
 
             # New Authenticated answers per hour
             if h in hours_auth.keys():
-                hourNewAuthStats['values'].append(dict(x=int(h), y=hours[h], size=hours_auth[h]*10))
+                #hourNewAuthStats['values'].append(dict(x=int(h), y=hours[h], size=hours_auth[h]*10))
+                if (hours_auth[h] != 0):
+                    hourNewAuthStats['values'].append([int(h), hours_auth[h], (hours_auth[h]*5)/max_hours])
+                else:
+                    hourNewAuthStats['values'].append([int(h), hours_auth[h], 0])
 
         # Count total number of answers for users
         anonymous = 0
