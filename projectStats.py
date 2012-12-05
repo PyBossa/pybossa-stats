@@ -229,8 +229,8 @@ if __name__ == "__main__":
             else:
                 authenticated += 1
 
-        userStats['values'].append(dict(label="Anonymous", value=anonymous))
-        userStats['values'].append(dict(label="Authenticated", value=authenticated))
+        userStats['values'].append(dict(label="Anonymous", value=[0, anonymous]))
+        userStats['values'].append(dict(label="Authenticated", value=[0, authenticated]))
         from collections import Counter
         c_anon_users = Counter(anon_users)
         c_auth_users = Counter(auth_users)
@@ -248,6 +248,7 @@ if __name__ == "__main__":
         gi = pygeoip.GeoIP('dat/GeoIP.dat')
         gic = pygeoip.GeoIP('dat/GeoLiteCity.dat')
         top5_anon = []
+        top5_auth = []
         loc_anon = []
         for u in c_anon_users.most_common(5):
             loc = gic.record_by_addr(u[0])
@@ -257,8 +258,12 @@ if __name__ == "__main__":
             loc = gic.record_by_addr(u[0])
             loc_anon.append(dict(ip=u[0],loc=loc, tasks=u[1]))
 
+        for u in c_auth_users.most_common(5):
+            top5_auth.append(dict(id=u[0], tasks=u[1]))
+
         userAnonStats['top5'] = top5_anon
         userAnonStats['locs'] = loc_anon
+        userAuthStats['top5'] = top5_auth
 
         # Exporting the data
         # Create a folder for the output
@@ -327,7 +332,7 @@ if __name__ == "__main__":
                 users=len(userAuthStats['values']),
                 taskruns=authenticated,
                 pct_taskruns=100-anon_pct_taskruns,
-                top5=c_auth_users.most_common(5)
+                top5=top5_auth
                 )
             )).encode('utf-8', 'ignore'))
         f.close()
