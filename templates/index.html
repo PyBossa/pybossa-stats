@@ -81,31 +81,6 @@
                         HtmlText: false,
                         legend  : {postion: 'nw'}
                     });
-                    console.log(_.max(appStats.hourStats[0]));
-                    console.log((appStats.hourStats[0].max));
-                    //nv.addGraph(function() {
-                    //  var data = appStats.hourStats;
-                    //  var chart = nv.models.scatterChart()
-                    //                .showDistX(true)
-                    //                .showDistY(true)
-                    //                .color(d3.scale.category10().range());
-                    //
-                    //  chart.xAxis
-                    //    .axisLabel('Hours')
-                    //    .tickFormat(d3.format('i'));
-                    //  chart.yAxis
-                    //    .axisLabel('Answers')
-                    //    .tickFormat(d3.format('s'));
-                    //
-                    //   d3.select('#hourStats svg')
-                    //      .datum(data)
-                    //    .transition().duration(500)
-                    //      .call(chart);
-                    //
-                    //  nv.utils.windowResize(chart.update);
-                    //
-                    //  return chart;
-                    //});
                     </script>
                 </div>
             </div>
@@ -115,53 +90,64 @@
             <div id="card" class="row-fluid">
                 <div  class="span12  well">
                     <h2>Answers per day</h2>
-                    <div id="dayStats" style="margin:0">
-                    <svg style="height:400px;"></svg>
-                    </div>
+                    <div id="dayStats" style="margin:0;height:500px;"></div>
                     <script>
-                        //nv.addGraph(function() {
-                        //    var data = appStats.dayStats;
-                        //    var chart = nv.models.lineWithFocusChart()
-                        //          .margin({top: 30, right: 35, bottom: 50, left: 35})
-                        //          .x(function(d,i) { return i })
-                        //          .y(function(d) { return d[1] })
-                        //          .color(d3.scale.category10().range());
-                        //
-                        //    chart.xAxis
-                        //      .showMaxMin(true)
-                        //      .axisLabel('Days')
-                        //      .tickFormat(function(d) {
-                        //        var dx = data[0].values[d] && data[0].values[d][0] || 0;
-                        //        if (dx!=0) {
-                        //            return d3.time.format('%y-%m-%d')(new Date(dx))
-                        //        }
-                        //      });
+                    function date(obj) {
+                        var d = new Date(parseInt( obj ));
+                        var year = d.getFullYear();
+                        var month = d.getMonth() + 1;
+                        var day = d.getDate();
+                        return(year + "-" + month + '-' + day)
+                    }
+                    function answersPerDay(obj) {
+                        return (parseInt(obj.y) + " answers were submitted this day " + date(obj.x));
+                    }
+                    var options = {
+                        xaxis   : {tickFormatter: date},
+                        mouse   : {track: true, trackFormatter: answersPerDay},
+                        HtmlText: false,
+                        legend  : {postion: 'nw'},
+                        selection: {
+                            mode: 'x',
+                            fps: 30
+                        }
+                    };
 
-                        //    chart.x2Axis
-                        //      .showMaxMin(true)
-                        //      .tickFormat(function(d) {
-                        //        var dx = data[0].values[d] && data[0].values[d][0] || 0;
-                        //        if (dx!=0) {
-                        //            return d3.time.format('%y-%m-%d')(new Date(dx))
-                        //        }
-                        //      });
+                    var container = document.getElementById('dayStats');
 
+                    function drawGraph(opts) {
+                        // Clone the options, so the 'options' variable always keeps intact.
+                        var o = Flotr._.extend(Flotr._.clone(options), opts || {});
+                        
+                        // Return a new graph.
+                        return Flotr.draw(
+                        container, [{data: appStats.dayStats[1]['values'], label:appStats.dayStats[1]['label']},{ data:appStats.dayStats[2]['values'],label:appStats.dayStats[2]['label'] }], o);
+                    }
+                        
+                        // Actually draw the graph.
+                        graph = drawGraph();
+                        
+                        // Hook into the 'flotr:select' event.
+                        Flotr.EventAdapter.observe(container, 'flotr:select', function(area) {
+                        
+                            // Draw graph with new area
+                            graph = drawGraph({
+                                xaxis: {
+                                    tickFormatter: date,
+                                    min: area.x1,
+                                    max: area.x2
+                                },
+                                yaxis: {
+                                    min: area.y1,
+                                    max: area.y2
+                                }
+                            });
+                        });
 
-                        //    chart.yAxis
-                        //        .axisLabel('Answers')
-                        //        .tickFormat(d3.format(',s'));
-                        //
-                        //    chart.y2Axis
-                        //        .tickFormat(d3.format(',s'));
-                        //
-                        //    d3.select('#dayStats svg')
-                        //        .datum(data)
-                        //      .transition().duration(500).call(chart);
-                        //
-                        //    nv.utils.windowResize(chart.update);
-                        //
-                        //    return chart;
-                        //});
+                        // When graph is clicked, draw the graph with default area.
+                        Flotr.EventAdapter.observe(container, 'flotr:click', function() {
+                            drawGraph();
+                        });
                     </script>
                 </div>
             </div>

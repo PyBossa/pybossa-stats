@@ -132,13 +132,13 @@ if __name__ == "__main__":
             task_runs = pbclient.get_taskruns(app.id, offset=offset)
 
 
-        userStats = dict(key="User Statistics", values=[])
-        userAnonStats = dict(key="Anonymous Users", values=[], top5=[], locs=[])
-        userAuthStats = dict(key="Authenticated Users", values=[], top5=[])
-        dayNewStats    = dict(key="Anon + Auth",   values=[])
-        dayTotalStats  = dict(key="Total", disabled="True", values=[])
-        dayNewAnonStats  = dict(key="Anonymous", values=[])
-        dayNewAuthStats  = dict(key="Authenticated", values=[])
+        userStats = dict(label="User Statistics", values=[])
+        userAnonStats = dict(label="Anonymous Users", values=[], top5=[], locs=[])
+        userAuthStats = dict(label="Authenticated Users", values=[], top5=[])
+        dayNewStats    = dict(label="Anon + Auth",   values=[])
+        dayTotalStats  = dict(label="Total", disabled="True", values=[])
+        dayNewAnonStats  = dict(label="Anonymous", values=[])
+        dayNewAuthStats  = dict(label="Authenticated", values=[])
 
         hourNewStats    = dict(label="Anon + Auth", disabled="True", values=[], max=0)
         hourNewAnonStats  = dict(label="Anonymous", values=[], max=0)
