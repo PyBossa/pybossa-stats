@@ -63,6 +63,7 @@ if __name__ == "__main__":
         dates = {} 
         dates_anon = {} 
         dates_auth = {} 
+        dates_n_tasks = {}
         hours = {}
         hours_anon = {}
         hours_auth = {}
@@ -75,8 +76,28 @@ if __name__ == "__main__":
             hours[u'%s' % i]=0
             hours_anon[u'%s' % i]=0
             hours_auth[u'%s' % i]=0
+
+        tasks = pbclient.get_tasks(app.id)
+        n_answers_per_task = []
+        avg = 0
+        while len(tasks) > 0:
+            for t in tasks:
+                if 'n_answers' in t.info.keys():
+                    n_answers_per_task.append(int(t.info['n_answers']))
+                else:
+                    if t.n_answers:
+                        n_answers_per_task.append(int(t.n_answers))
+                    else:
+                        n_answers_per_task.append(30)
+            offset = offset + 100
+            tasks = pbclient.get_tasks(app.id, offset=offset, limit=100)
+
+        avg = sum(n_answers_per_task)/len(n_answers_per_task)
+        total_n_tasks = len(n_answers_per_task)
  
         import string
+        limit = 100
+        offset = 0
         while len(task_runs) > 0:
             for tr in task_runs:
                 if tr.app_id == app.id:
@@ -100,6 +121,14 @@ if __name__ == "__main__":
                     else:
                         dates[date] = 1
                         #dates[tr.finish_time] = 1
+
+                    if date in dates_n_tasks.keys():
+                        dates_n_tasks[date] = total_n_tasks * avg
+                        #dates[tr.finish_time] +=1
+                    else:
+                        dates_n_tasks[date] = total_n_tasks * avg
+                        #dates[tr.finish_time] = 1
+
 
                     if tr.user_id is None:
                         if date in dates_anon.keys():
@@ -136,13 +165,17 @@ if __name__ == "__main__":
 
 
             offset = offset + 100
-            task_runs = pbclient.get_taskruns(app.id, offset=offset)
+            task_runs = pbclient.get_taskruns(app.id, offset=offset,limit=limit)
 
+
+        #for d in dates.keys():
+        #    dates[d] = int(dates[d]/avg)
 
         userStats = dict(label="User Statistics", values=[])
         userAnonStats = dict(label="Anonymous Users", values=[], top5=[], locs=[])
         userAuthStats = dict(label="Authenticated Users", values=[], top5=[])
         dayNewStats    = dict(label="Anon + Auth",   values=[])
+        dayAvgAnswers    = dict(label="Expected Answers",   values=[])
         dayTotalStats  = dict(label="Total", disabled="True", values=[])
         dayNewAnonStats  = dict(label="Anonymous", values=[])
         dayNewAuthStats  = dict(label="Authenticated", values=[])
@@ -162,6 +195,12 @@ if __name__ == "__main__":
                         time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
                         ), 
                     dates[d]])
+
+            dayAvgAnswers['values'].append(
+                    [int(
+                        time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
+                        ), 
+                    dates_n_tasks[d]])
 
             # Total answers per day
             total = total + dates[d]
@@ -352,7 +391,8 @@ if __name__ == "__main__":
                     dayNewStats,
                     dayNewAnonStats,
                     dayNewAuthStats,
-                    dayTotalStats],
+                    dayTotalStats,
+                    dayAvgAnswers],
                 hourStats=[
                     hourNewStats,
                     hourNewAnonStats,
