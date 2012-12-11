@@ -90,24 +90,31 @@ if __name__ == "__main__":
 
                     # Data for dates
                     date, hour = string.split(tr.finish_time, "T")
+                    tr.finish_time = string.split(tr.finish_time, '.')[0]
                     hour = string.split(hour,":")[0]
 
                     # Dates
                     if date in dates.keys():
                         dates[date] +=1
+                        #dates[tr.finish_time] +=1
                     else:
                         dates[date] = 1
+                        #dates[tr.finish_time] = 1
 
                     if tr.user_id is None:
                         if date in dates_anon.keys():
                             dates_anon[date] += 1
+                            #dates_anon[tr.finish_time] += 1
                         else:
                             dates_anon[date] = 1
+                            #dates_anon[tr.finish_time] = 1
                     else:
                         if date in dates_auth.keys():
                             dates_auth[date] += 1
+                            #dates_auth[tr.finish_time] += 1
                         else:
                             dates_auth[date] = 1
+                            #dates_auth[tr.finish_time] = 1
 
                     # Hours
                     if hour in hours.keys():

@@ -64,6 +64,7 @@
                     <div id="hourStats" style="margin:0;height:500px;">
                     </div>
                     <script>
+                    (function(){
                     function answersPerHour(obj) {
                         return (parseInt(obj.y) + " answers were submitted at " + parseInt(obj.x) + " hours");
                     }
@@ -80,17 +81,19 @@
                         HtmlText: false,
                         legend  : {postion: 'nw'}
                     });
+                    })();
                     </script>
                 </div>
             </div>
             <!-- END Hour Stats CARD -->
 
-            <!-- Day Stats CARD -->
+            <!-- Day Stats Total CARD -->
             <div id="card" class="row-fluid">
                 <div  class="span12  well">
-                    <h2>Answers per day <small> select an area to zoom, click to reset the chart</small></h2>
-                    <div id="dayStats" style="margin:0;height:500px;"></div>
+                    <h2>Total Answers per day <small> select an area to zoom, click to reset the chart</small></h2>
+                    <div id="dayStatsTotal" style="margin:0;height:500px;"></div>
                     <script>
+                    (function(){
                     function date(obj) {
                         var d = new Date(parseInt( obj ));
                         var year = d.getFullYear();
@@ -102,7 +105,77 @@
                         return (parseInt(obj.y) + " answers were submitted this day " + date(obj.x));
                     }
                     var options = {
-                        xaxis   : {tickFormatter: date},
+                        xaxis   : {mode:'time'},
+                        mouse   : {track: true, trackFormatter: answersPerDay},
+                        HtmlText: false,
+                        legend  : {postion: 'nw'},
+                        selection: {
+                            mode: 'x',
+                            fps: 30
+                        }
+                    };
+
+                    var dayStatsTotalContainer = document.getElementById('dayStatsTotal');
+
+                    function drawGraph(opts) {
+                        // Clone the options, so the 'options' variable always keeps intact.
+                        var o = Flotr._.extend(Flotr._.clone(options), opts || {});
+                        
+                        // Return a new graph.
+                        return Flotr.draw(
+                        dayStatsTotalContainer, [{ data:appStats.dayStats[3]['values'],label:appStats.dayStats[3]['label']} ], o);
+                    }
+                        
+                        // Actually draw the graph.
+                        graph = drawGraph();
+                        
+                        // Hook into the 'flotr:select' event.
+                        Flotr.EventAdapter.observe(dayStatsTotalContainer, 'flotr:select', function(area) {
+                        
+                            // Draw graph with new area
+                            graph = drawGraph({
+                                xaxis: {
+                                    mode: 'time',
+                                    min: area.x1,
+                                    max: area.x2
+                                },
+                                yaxis: {
+                                    min: area.y1,
+                                    max: area.y2
+                                }
+                            });
+                        });
+
+                        // When graph is clicked, draw the graph with default area.
+                        Flotr.EventAdapter.observe(dayStatsTotalContainer, 'flotr:click', function() {
+                            drawGraph();
+                        });
+                    })();
+                    </script>
+                </div>
+            </div>
+            <!-- END Day Stats CARD -->
+
+
+            <!-- Day Stats CARD -->
+            <div id="card" class="row-fluid">
+                <div  class="span12  well">
+                    <h2>Answers per day <small> select an area to zoom, click to reset the chart</small></h2>
+                    <div id="dayStats" style="margin:0;height:500px;"></div>
+                    <script>
+                    (function(){
+                    function date(obj) {
+                        var d = new Date(parseInt( obj ));
+                        var year = d.getFullYear();
+                        var month = d.getMonth() + 1;
+                        var day = d.getDate();
+                        return(year + "-" + month + '-' + day)
+                    }
+                    function answersPerDay(obj) {
+                        return (parseInt(obj.y) + " answers were submitted this day " + date(obj.x));
+                    }
+                    var options = {
+                        xaxis   : {mode:'time'},
                         mouse   : {track: true, trackFormatter: answersPerDay},
                         HtmlText: false,
                         legend  : {postion: 'nw'},
@@ -120,7 +193,7 @@
                         
                         // Return a new graph.
                         return Flotr.draw(
-                        dayStatsContainer, [{data: appStats.dayStats[1]['values'], label:appStats.dayStats[1]['label']},{ data:appStats.dayStats[2]['values'],label:appStats.dayStats[2]['label'] }], o);
+                        dayStatsContainer, [{data: appStats.dayStats[1]['values'], label:appStats.dayStats[1]['label']},{ data:appStats.dayStats[2]['values'],label:appStats.dayStats[2]['label'] }, { data:appStats.dayStats[0]['values'],label:appStats.dayStats[0]['label']} ], o);
                     }
                         
                         // Actually draw the graph.
@@ -132,7 +205,7 @@
                             // Draw graph with new area
                             graph = drawGraph({
                                 xaxis: {
-                                    tickFormatter: date,
+                                    mode: 'time',
                                     min: area.x1,
                                     max: area.x2
                                 },
@@ -147,6 +220,7 @@
                         Flotr.EventAdapter.observe(dayStatsContainer, 'flotr:click', function() {
                             drawGraph();
                         });
+                    })();
                     </script>
                 </div>
             </div>
@@ -180,6 +254,7 @@
                         <div id="userAnsStats" class="span4" style="height: 250px; width:250px;">
                         </div>
                         <script>
+                        (function(){
                         var container = document.getElementById('userAnsStats');
                         var graph = Flotr.draw(container, [
                             {data:[appStats.userStats['values'][0]['value']], label:appStats.userStats['values'][0]['label']},
@@ -192,6 +267,7 @@
                             yaxis   : {showLabels: false},
                             legend  : {postion: 'nw'}
                         });
+                        })();
                         </script>
                     </div>
                 </div>
@@ -232,6 +308,7 @@
                         <div id="userAnonStats" class="span4"  style='height:400px;width:400px'>
                         </div>
                         <script>
+                        (function(){
                         var container = document.getElementById('userAnonStats');
                         var graph = Flotr.draw(container, [
                             {data:[[0, appStats.userAnonStats['top5'][0]['tasks'] ]],  label:appStats.userAnonStats['top5'][0]['ip']},
@@ -247,6 +324,7 @@
                             yaxis   : {showLabels: false},
                             legend  : {postion: 'nw'}
                         });
+                        })();
                         </script>
                     </div>
                     <div class="row-fluid">
@@ -254,6 +332,7 @@
                             <div id="map" style="height:250px;"></div>
                         </div>
                         <script>
+                            (function(){
                             var map = L.map('map');
                             map.fitWorld();
                             map.setZoom(1);
@@ -275,7 +354,7 @@
                                 markers.addLayer(L.marker([lat,lng]));
                             }
                             map.addLayer(markers);
-
+                            })();
                         </script>
                     </div>
                 </div>
@@ -312,6 +391,7 @@
                         <div id="userAuthStats" class="span4" style='height:400px;width:400px'>
                         </div>
                         <script>
+                        (function(){
                         var container = document.getElementById('userAuthStats');
                         var graph = Flotr.draw(container, [
                             {data:[[0, appStats.userAuthStats['top5'][0]['tasks'] ]],  label:appStats.userAuthStats['top5'][0]['id']},
@@ -327,6 +407,7 @@
                             yaxis   : {showLabels: false},
                             legend  : {postion: 'nw'}
                         });
+                        })();
                         </script>
                     </div>
                 </div>
