@@ -5921,8 +5921,6 @@ button.close {
         </script>
     </head>
     <body>
-<a href="https://github.com/PyBossa/pybossa-stats"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
-
         <div class="container-fluid">
             <div id="heading" class="row-fluid">
                 
@@ -5936,13 +5934,6 @@ button.close {
             </div>
 
             
-            <div class="row-fluid">
-                <div class="span12 well">
-                    <p style="font-size:30px;line-height:34px;"><strong>Important:</strong> Data have been <strong>anonymized!</strong></p>
-                </div>
-            </div>
-
-            
 
             <!-- Hour Stats CARD -->
             <div id="card" class="row-fluid">
@@ -5951,6 +5942,7 @@ button.close {
                     <div id="hourStats" style="margin:0;height:500px;">
                     </div>
                     <script>
+                    (function(){
                     function answersPerHour(obj) {
                         return (parseInt(obj.y) + " answers were submitted at " + parseInt(obj.x) + " hours");
                     }
@@ -5967,10 +5959,81 @@ button.close {
                         HtmlText: false,
                         legend  : {postion: 'nw'}
                     });
+                    })();
                     </script>
                 </div>
             </div>
             <!-- END Hour Stats CARD -->
+
+            <!-- Day Stats Total CARD -->
+            <div id="card" class="row-fluid">
+                <div  class="span12  well">
+                    <h2>Total Answers per day <small> select an area to zoom, click to reset the chart</small></h2>
+                    <div id="dayStatsTotal" style="margin:0;height:500px;"></div>
+                    <script>
+                    (function(){
+                    function date(obj) {
+                        var d = new Date(parseInt( obj ));
+                        var year = d.getFullYear();
+                        var month = d.getMonth() + 1;
+                        var day = d.getDate();
+                        return(year + "-" + month + '-' + day)
+                    }
+                    function answersPerDay(obj) {
+                        return ("Total answers: " + parseInt(obj.y));
+                    }
+                    var options = {
+                        xaxis   : {mode:'time'},
+                        mouse   : {track: true, trackFormatter: answersPerDay},
+                        HtmlText: false,
+                        legend  : {postion: 'nw'},
+                        selection: {
+                            mode: 'x',
+                            fps: 30
+                        }
+                    };
+
+                    var dayStatsTotalContainer = document.getElementById('dayStatsTotal');
+
+                    function drawGraph(opts) {
+                        // Clone the options, so the 'options' variable always keeps intact.
+                        var o = Flotr._.extend(Flotr._.clone(options), opts || {});
+                        
+                        // Return a new graph.
+                        return Flotr.draw(
+                        dayStatsTotalContainer, [{ data:appStats.dayStats[3]['values'],label:appStats.dayStats[3]['label']} ], o);
+                    }
+                        
+                        // Actually draw the graph.
+                        graph = drawGraph();
+                        
+                        // Hook into the 'flotr:select' event.
+                        Flotr.EventAdapter.observe(dayStatsTotalContainer, 'flotr:select', function(area) {
+                        
+                            // Draw graph with new area
+                            graph = drawGraph({
+                                xaxis: {
+                                    mode: 'time',
+                                    min: area.x1,
+                                    max: area.x2
+                                },
+                                yaxis: {
+                                    min: area.y1,
+                                    max: area.y2
+                                }
+                            });
+                        });
+
+                        // When graph is clicked, draw the graph with default area.
+                        Flotr.EventAdapter.observe(dayStatsTotalContainer, 'flotr:click', function() {
+                            drawGraph();
+                        });
+                    })();
+                    </script>
+                </div>
+            </div>
+            <!-- END Day Stats CARD -->
+
 
             <!-- Day Stats CARD -->
             <div id="card" class="row-fluid">
@@ -5978,6 +6041,7 @@ button.close {
                     <h2>Answers per day <small> select an area to zoom, click to reset the chart</small></h2>
                     <div id="dayStats" style="margin:0;height:500px;"></div>
                     <script>
+                    (function(){
                     function date(obj) {
                         var d = new Date(parseInt( obj ));
                         var year = d.getFullYear();
@@ -5989,7 +6053,7 @@ button.close {
                         return (parseInt(obj.y) + " answers were submitted this day " + date(obj.x));
                     }
                     var options = {
-                        xaxis   : {tickFormatter: date},
+                        xaxis   : {mode:'time'},
                         mouse   : {track: true, trackFormatter: answersPerDay},
                         HtmlText: false,
                         legend  : {postion: 'nw'},
@@ -6007,7 +6071,7 @@ button.close {
                         
                         // Return a new graph.
                         return Flotr.draw(
-                        dayStatsContainer, [{data: appStats.dayStats[1]['values'], label:appStats.dayStats[1]['label']},{ data:appStats.dayStats[2]['values'],label:appStats.dayStats[2]['label'] }], o);
+                        dayStatsContainer, [{data: appStats.dayStats[1]['values'], label:appStats.dayStats[1]['label']},{ data:appStats.dayStats[2]['values'],label:appStats.dayStats[2]['label'] }, { data:appStats.dayStats[0]['values'],label:appStats.dayStats[0]['label']} ], o);
                     }
                         
                         // Actually draw the graph.
@@ -6019,7 +6083,7 @@ button.close {
                             // Draw graph with new area
                             graph = drawGraph({
                                 xaxis: {
-                                    tickFormatter: date,
+                                    mode: 'time',
                                     min: area.x1,
                                     max: area.x2
                                 },
@@ -6034,6 +6098,7 @@ button.close {
                         Flotr.EventAdapter.observe(dayStatsContainer, 'flotr:click', function() {
                             drawGraph();
                         });
+                    })();
                     </script>
                 </div>
             </div>
@@ -6057,14 +6122,14 @@ button.close {
                             
                                 <tr>
                                     <th>Authenticated</th>
-                                    <th>1766</th>
-                                    <th>42 %</th>
+                                    <th>2820</th>
+                                    <th>52 %</th>
                                 </tr>
                             
                                 <tr>
                                     <th>Anonymous</th>
-                                    <th>2464</th>
-                                    <th>58 %</th>
+                                    <th>2682</th>
+                                    <th>48 %</th>
                                 </tr>
                             
                             </table>
@@ -6073,6 +6138,7 @@ button.close {
                         <div id="userAnsStats" class="span4" style="height: 250px; width:250px;">
                         </div>
                         <script>
+                        (function(){
                         var container = document.getElementById('userAnsStats');
                         var graph = Flotr.draw(container, [
                             {data:[appStats.userStats['values'][0]['value']], label:appStats.userStats['values'][0]['label']},
@@ -6085,6 +6151,7 @@ button.close {
                             yaxis   : {showLabels: false},
                             legend  : {postion: 'nw'}
                         });
+                        })();
                         </script>
                     </div>
                 </div>
@@ -6097,7 +6164,7 @@ button.close {
                     <h2>Details about Anonymous Users</h2>
                     <div class="row-fluid">
                         <div class="span6">
-                            <p><strong>154 </strong> have <strong>participated</strong>.</p>
+                            <p><strong>169 </strong> have <strong>participated</strong>.</p>
                             
                             <h4>Top 5 users</h4>
                             <table class="table table-hover table-bordered table-striped">
@@ -6113,7 +6180,7 @@ button.close {
                             
                                 <tr>
                                     <th>1</th>
-                                    <th>272.368.416.445</th>
+                                    <th>66.94.72.122</th>
                                     <th>United States</th>
                                     <th>Cleveland</th>
                                     <th>258</th>
@@ -6121,7 +6188,7 @@ button.close {
                             
                                 <tr>
                                     <th>2</th>
-                                    <th>283.405.493.433</th>
+                                    <th>93.197.234.99</th>
                                     <th>Germany</th>
                                     <th>Dortmund</th>
                                     <th>143</th>
@@ -6129,7 +6196,7 @@ button.close {
                             
                                 <tr>
                                     <th>3</th>
-                                    <th>271.270.495.432</th>
+                                    <th>24.197.118.60</th>
                                     <th>United States</th>
                                     <th>Taylorsville</th>
                                     <th>124</th>
@@ -6137,7 +6204,7 @@ button.close {
                             
                                 <tr>
                                     <th>4</th>
-                                    <th>380.366.397.410</th>
+                                    <th>158.64.56.10</th>
                                     <th>Luxembourg</th>
                                     <th>Luxemburg</th>
                                     <th>120</th>
@@ -6145,7 +6212,7 @@ button.close {
                             
                                 <tr>
                                     <th>5</th>
-                                    <th>324.329.324.452</th>
+                                    <th>130.237.41.115</th>
                                     <th>Sweden</th>
                                     <th>Sollentuna</th>
                                     <th>100</th>
@@ -6157,6 +6224,7 @@ button.close {
                         <div id="userAnonStats" class="span4"  style='height:400px;width:400px'>
                         </div>
                         <script>
+                        (function(){
                         var container = document.getElementById('userAnonStats');
                         var graph = Flotr.draw(container, [
                             {data:[[0, appStats.userAnonStats['top5'][0]['tasks'] ]],  label:appStats.userAnonStats['top5'][0]['ip']},
@@ -6172,6 +6240,7 @@ button.close {
                             yaxis   : {showLabels: false},
                             legend  : {postion: 'nw'}
                         });
+                        })();
                         </script>
                     </div>
                     <div class="row-fluid">
@@ -6179,6 +6248,7 @@ button.close {
                             <div id="map" style="height:250px;"></div>
                         </div>
                         <script>
+                            (function(){
                             var map = L.map('map');
                             map.fitWorld();
                             map.setZoom(1);
@@ -6200,7 +6270,7 @@ button.close {
                                 markers.addLayer(L.marker([lat,lng]));
                             }
                             map.addLayer(markers);
-
+                            })();
                         </script>
                     </div>
                 </div>
@@ -6213,7 +6283,7 @@ button.close {
                     <h2>Details about Authenticated Users</h2>
                     <div class="row-fluid">
                         <div class="span6">
-                            <p><strong>41 </strong> have <strong>participated</strong>.</p>
+                            <p><strong>48 </strong> have <strong>participated</strong>.</p>
                             
                             <h4>Top 5 users</h4>
                             <table class="table table-hover table-bordered table-striped">
@@ -6227,32 +6297,32 @@ button.close {
                             
                                 <tr>
                                     <th>1</th>
+                                    <th>536</th>
+                                    <th>391</th>
+                                </tr>
+                            
+                                <tr>
+                                    <th>2</th>
+                                    <th>517</th>
+                                    <th>390</th>
+                                </tr>
+                            
+                                <tr>
+                                    <th>3</th>
                                     <th>384</th>
                                     <th>231</th>
                                 </tr>
                             
                                 <tr>
-                                    <th>2</th>
+                                    <th>4</th>
                                     <th>354</th>
                                     <th>202</th>
                                 </tr>
                             
                                 <tr>
-                                    <th>3</th>
+                                    <th>5</th>
                                     <th>443</th>
                                     <th>196</th>
-                                </tr>
-                            
-                                <tr>
-                                    <th>4</th>
-                                    <th>463</th>
-                                    <th>166</th>
-                                </tr>
-                            
-                                <tr>
-                                    <th>5</th>
-                                    <th>464</th>
-                                    <th>151</th>
                                 </tr>
                             
                             </table>
@@ -6261,6 +6331,7 @@ button.close {
                         <div id="userAuthStats" class="span4" style='height:400px;width:400px'>
                         </div>
                         <script>
+                        (function(){
                         var container = document.getElementById('userAuthStats');
                         var graph = Flotr.draw(container, [
                             {data:[[0, appStats.userAuthStats['top5'][0]['tasks'] ]],  label:appStats.userAuthStats['top5'][0]['id']},
@@ -6276,6 +6347,7 @@ button.close {
                             yaxis   : {showLabels: false},
                             legend  : {postion: 'nw'}
                         });
+                        })();
                         </script>
                     </div>
                 </div>
