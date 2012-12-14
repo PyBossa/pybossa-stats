@@ -39,7 +39,7 @@
                     <img class="img-polaroid" src="{{app.info.thumbnail}}"/>
                 </div>
                 <div class="span11">
-                    <h1 >Stats for application: <small style="font-size:32px">{{app.name}}</small></h1>
+                    <h1>Stats for application: <small style="font-size:32px">{{app.name}}</small></h1>
                 </div>
                 {% else %}
                 <div class="span12">
@@ -414,6 +414,13 @@
                 </div>
             </div>
             <!-- END Auth User Stats CARD -->
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div id="chartUpdate" class="span12" style="text-align:center">
+                        <h2><small style="font-size:32px"> Charts created {{day.strftime('%Y-%m-%d')}}</small></h1>
+                </div>
+            </div>
         </div>
     </body>
 </html> 
