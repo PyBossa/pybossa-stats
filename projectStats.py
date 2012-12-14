@@ -19,6 +19,7 @@
 from optparse import OptionParser
 import pbclient
 from jinja2 import Environment, FileSystemLoader
+import time
 
 env = Environment(loader=FileSystemLoader('templates'))
 template = env.get_template('index.html')
@@ -64,6 +65,7 @@ if __name__ == "__main__":
         dates_anon = {} 
         dates_auth = {} 
         dates_n_tasks = {}
+        dates_estimate = {}
         hours = {}
         hours_anon = {}
         hours_auth = {}
@@ -117,33 +119,24 @@ if __name__ == "__main__":
                     # Dates
                     if date in dates.keys():
                         dates[date] +=1
-                        #dates[tr.finish_time] +=1
                     else:
                         dates[date] = 1
-                        #dates[tr.finish_time] = 1
 
                     if date in dates_n_tasks.keys():
                         dates_n_tasks[date] = total_n_tasks * avg
-                        #dates[tr.finish_time] +=1
                     else:
                         dates_n_tasks[date] = total_n_tasks * avg
-                        #dates[tr.finish_time] = 1
-
 
                     if tr.user_id is None:
                         if date in dates_anon.keys():
                             dates_anon[date] += 1
-                            #dates_anon[tr.finish_time] += 1
                         else:
                             dates_anon[date] = 1
-                            #dates_anon[tr.finish_time] = 1
                     else:
                         if date in dates_auth.keys():
                             dates_auth[date] += 1
-                            #dates_auth[tr.finish_time] += 1
                         else:
                             dates_auth[date] = 1
-                            #dates_auth[tr.finish_time] = 1
 
                     # Hours
                     if hour in hours.keys():
@@ -168,14 +161,37 @@ if __name__ == "__main__":
             task_runs = pbclient.get_taskruns(app.id, offset=offset,limit=limit)
 
 
-        #for d in dates.keys():
-        #    dates[d] = int(dates[d]/avg)
+        print "total days used: %s" % len(dates)
+        import operator
+        sorted_answers = sorted(dates.iteritems(), key=operator.itemgetter(0))
+        import datetime
+        last_day = datetime.datetime.strptime( sorted_answers[-1][0], "%Y-%m-%d")
+        print last_day
+        total_answers = sum(dates.values())
+        avg_answers_per_day = total_answers/len(dates)
+        required_days_to_finish = ((avg*total_n_tasks)-total_answers)/avg_answers_per_day
+        print "total number of required answers: %s" % (avg*total_n_tasks)
+        print "total number of received answers: %s" % total_answers
+        print "avg number of answers per day: %s" % avg_answers_per_day
+        print "To complete all the tasks at a pace of %s per day, the app will need %s days" % (avg_answers_per_day, required_days_to_finish)
+        # Create the estimates curve
+        from datetime import timedelta
+        pace = total_answers 
+        for i in range(0, required_days_to_finish + 2):
+            tmp = last_day + timedelta(days=(i))
+            tmp_str = tmp.date().strftime('%Y-%m-%d')
+            dates_estimate[tmp_str] = pace
+            pace = pace + avg_answers_per_day
+
+        print len(dates_estimate)
+        print len(dates)
 
         userStats = dict(label="User Statistics", values=[])
         userAnonStats = dict(label="Anonymous Users", values=[], top5=[], locs=[])
         userAuthStats = dict(label="Authenticated Users", values=[], top5=[])
         dayNewStats    = dict(label="Anon + Auth",   values=[])
         dayAvgAnswers    = dict(label="Expected Answers",   values=[])
+        dayEstimates    = dict(label="Estimation",   values=[])
         dayTotalStats  = dict(label="Total", disabled="True", values=[])
         dayNewAnonStats  = dict(label="Anonymous", values=[])
         dayNewAuthStats  = dict(label="Authenticated", values=[])
@@ -185,7 +201,6 @@ if __name__ == "__main__":
         hourNewAuthStats  = dict(label="Authenticated", values=[], max=0)
 
         total = 0
-        import time
         # Dates
         for d in sorted(dates.keys()):
             # JavaScript expects miliseconds since EPOCH
@@ -201,6 +216,8 @@ if __name__ == "__main__":
                         time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
                         ), 
                     dates_n_tasks[d]])
+
+
 
             # Total answers per day
             total = total + dates[d]
@@ -237,6 +254,21 @@ if __name__ == "__main__":
                             time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
                             ), 
                         0])
+
+
+        for d in sorted(dates_estimate.keys()):
+            dayEstimates['values'].append(
+                    [int(
+                        time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
+                        ), 
+                    dates_estimate[d]])
+
+            dayAvgAnswers['values'].append(
+                    [int(
+                        time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
+                        ), 
+                    dates_n_tasks.values()[0]])
+
 
         # Hours 
         hourNewStats['max'] = max_hours
@@ -392,7 +424,8 @@ if __name__ == "__main__":
                     dayNewAnonStats,
                     dayNewAuthStats,
                     dayTotalStats,
-                    dayAvgAnswers],
+                    dayAvgAnswers,
+                    dayEstimates],
                 hourStats=[
                     hourNewStats,
                     hourNewAnonStats,
