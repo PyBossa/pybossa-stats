@@ -399,7 +399,7 @@ if __name__ == "__main__":
 
         import codecs
         f = open(os.path.join(options.app,'index.html'),'w')
-        f.write(template.render(app=app, private=options.private, userStats=dict(
+        f.write(template.render(day=datetime.datetime.today(),app=app, private=options.private, userStats=dict(
             anonymous=dict(
                 users=len(userAnonStats['values']),
                 taskruns=anonymous,
