@@ -1,18 +1,18 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2012 Citizen Cyberscience Centre
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # Arguments for the application
     usage = "usage: %prog [options]"
     parser = OptionParser(usage)
-    
+
     parser.add_option("-s", "--server", dest="api_url", help="PyBossa URL http://domain.com/", metavar="URL")
     parser.add_option("-k", "--api-key", dest="api_key", help="PyBossa User API-KEY to interact with PyBossa", metavar="API-KEY")
     parser.add_option("-a", "--app", dest="app", help="PyBossa app", metavar="APP")
@@ -61,9 +61,9 @@ if __name__ == "__main__":
         anon_users = []
         auth_users =[]
         task_runs = pbclient.get_taskruns(app.id)
-        dates = {} 
-        dates_anon = {} 
-        dates_auth = {} 
+        dates = {}
+        dates_anon = {}
+        dates_auth = {}
         dates_n_tasks = {}
         dates_estimate = {}
         hours = {}
@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
         avg = sum(n_answers_per_task)/len(n_answers_per_task)
         total_n_tasks = len(n_answers_per_task)
- 
+
         import string
         limit = 100
         offset = 0
@@ -176,7 +176,7 @@ if __name__ == "__main__":
         print "To complete all the tasks at a pace of %s per day, the app will need %s days" % (avg_answers_per_day, required_days_to_finish)
         # Create the estimates curve
         from datetime import timedelta
-        pace = total_answers 
+        pace = total_answers
         for i in range(0, required_days_to_finish + 2):
             tmp = last_day + timedelta(days=(i))
             tmp_str = tmp.date().strftime('%Y-%m-%d')
@@ -208,13 +208,13 @@ if __name__ == "__main__":
             dayNewStats['values'].append(
                     [int(
                         time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
-                        ), 
+                        ),
                     dates[d]])
 
             dayAvgAnswers['values'].append(
                     [int(
                         time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
-                        ), 
+                        ),
                     dates_n_tasks[d]])
 
 
@@ -224,7 +224,7 @@ if __name__ == "__main__":
             dayTotalStats['values'].append(
                     [int(
                         time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
-                        ), 
+                        ),
                     total])
 
             # Anonymous answers per day
@@ -232,13 +232,13 @@ if __name__ == "__main__":
                 dayNewAnonStats['values'].append(
                         [int(
                             time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
-                            ), 
+                            ),
                         dates_anon[d]])
             else:
                 dayNewAnonStats['values'].append(
                         [int(
                             time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
-                            ), 
+                            ),
                         0])
 
             # Authenticated answers per day
@@ -246,13 +246,13 @@ if __name__ == "__main__":
                 dayNewAuthStats['values'].append(
                         [int(
                             time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
-                            ), 
+                            ),
                         dates_auth[d]])
             else:
                 dayNewAuthStats['values'].append(
                         [int(
                             time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
-                            ), 
+                            ),
                         0])
 
 
@@ -260,17 +260,17 @@ if __name__ == "__main__":
             dayEstimates['values'].append(
                     [int(
                         time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
-                        ), 
+                        ),
                     dates_estimate[d]])
 
             dayAvgAnswers['values'].append(
                     [int(
                         time.mktime(time.strptime( d, "%Y-%m-%d"))*1000
-                        ), 
+                        ),
                     dates_n_tasks.values()[0]])
 
 
-        # Hours 
+        # Hours
         hourNewStats['max'] = max_hours
         hourNewAnonStats['max'] = max_hours_anon
         hourNewAuthStats['max'] = max_hours_auth
@@ -345,12 +345,16 @@ if __name__ == "__main__":
 
         # Exporting the data
         # Create a folder for the output
-        import os.path 
+        import os.path
         import shutil
         if not os.path.isdir(options.app):
             os.makedirs(os.path.join(options.app,'img'))
-            shutil.copy("templates/img/navy_blue.png", 
-                    os.path.join(options.app,'img'))
+            shutil.copy("templates/img/navy_blue.png",
+                        os.path.join(options.app,'img'))
+            shutil.copy("templates/img/info-icon.png",
+                        os.path.join(options.app,'img'))
+            shutil.copy("templates/img/pybossa.png",
+                        os.path.join(options.app,'img'))
         anon_pct_taskruns = int((anonymous*100)/(anonymous+authenticated))
         # Check if we need to anonymize the data
         table_ip_random = {}
@@ -416,7 +420,7 @@ if __name__ == "__main__":
         f.close()
         f = open(os.path.join(options.app,'Stats.json'), 'w')
         import json
-        Stats = dict(userStats=userStats, 
+        Stats = dict(userStats=userStats,
                 userAnonStats=userAnonStats,
                 userAuthStats=userAuthStats,
                 dayStats=[
@@ -431,7 +435,7 @@ if __name__ == "__main__":
                     hourNewAnonStats,
                     hourNewAuthStats,
                     ])
-        tmp = "appStats = " 
+        tmp = "appStats = "
         f.write("appStats = " + json.dumps(Stats) + ";")
         f.close()
     else:

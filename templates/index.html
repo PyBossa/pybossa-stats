@@ -14,10 +14,10 @@
         <script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
 
         <style>
-        {% include "css/style.css" %}
         {% include "css/bootstrap.css" %}
         {% include "css/MarkerCluster.css" %}
         {% include "css/MarkerCluster.Default.css" %}
+        {% include "css/stats.css" %}
         </style>
         <!-- Graph toolkits -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -25,6 +25,7 @@
         <script>
         {% include "js/flotr2.min.js" %}
         {% include "js/underscore-min.js" %}
+        {% include "js/bootstrap-alert.js" %}
         </script>
         <script src="Stats.json"></script>
         <script>
@@ -36,25 +37,28 @@
             <div id="heading" class="row-fluid">
                 {% if app.info.thumbnail %}
                 <div class="span1">
-                    <img class="img-polaroid" src="{{app.info.thumbnail}}"/>
+                    <img src="{{app.info.thumbnail}}"/>
                 </div>
-                <div class="span11">
-                    <h1>Stats for application: <small style="font-size:32px">{{app.name}}</small></h1>
+                <div class="span8">
+                    <h1>Stats for application: <strong>{{app.name}}</strong></h1>
                 </div>
                 {% else %}
                 <div class="span12">
-                    <h1 >Stats for application: <small style="font-size:32px">{{app.name}}</small></h1>
+                    <h1 >Stats for application: <small>{{app.name}}</small></h1>
                 </div>
                 {% endif %}
             </div>
+            <a class="pybossa" href="http://dev.pybossa.com">
+                <img src="img/pybossa.png"/>
+            </a>
 
             {% if private %}
             <div class="row-fluid">
-                <div class="span12 well">
-                    <p style="font-size:30px;line-height:34px;"><strong>Important:</strong> Data have been <strong>anonymized!</strong></p>
+                <div class="alert alert-info">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <strong>Important:</strong> Data have been <strong>anonymized!</strong>
                 </div>
             </div>
-
             {% endif %}
 
             <!-- Hour Stats CARD -->
