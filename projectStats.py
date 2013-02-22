@@ -465,5 +465,5 @@ if __name__ == "__main__":
 
     if options.list_apps:
         my_file = open("index.html", "w")
-        my_file.write(base.render(apps=index_apps))
+        my_file.write(unicode(base.render(apps=index_apps)).encode('utf-8'))
         my_file.close()
