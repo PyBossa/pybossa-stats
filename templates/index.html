@@ -354,9 +354,11 @@
                             var l = locations.length;
                             var markers = new L.MarkerClusterGroup();
                             for (i;i<l;i++) {
-                                var lat = parseFloat(locations[i].loc.latitude);
-                                var lng = parseFloat(locations[i].loc.longitude);
-                                markers.addLayer(L.marker([lat,lng]));
+                                if (locations[i].loc != null) {
+                                    var lat = parseFloat(locations[i].loc.latitude);
+                                    var lng = parseFloat(locations[i].loc.longitude);
+                                    markers.addLayer(L.marker([lat,lng]));
+                                }
                             }
                             map.addLayer(markers);
                             })();

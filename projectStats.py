@@ -413,13 +413,15 @@ if __name__ == "__main__":
                             table_user_id_random[auth_users[i]]=random_id
                             auth_users[i] = random_id
 
+                    for v in userAuthStats['top5']:
+                        if v['id'] in table_user_id_random.keys():
+                            v['id'] = table_user_id_random[v['id']]
 
                     for v in userAuthStats['values']:
-                        v['label'] = table_user_id_random[v['label']]
-
+                        if v['label'] in table_user_id_random.keys():
+                            v['label'] = table_user_id_random[v['label']]
                     # Re-create the Counter
                     c_auth_users = Counter(auth_users)
-
 
                 import codecs
                 f = open(os.path.join(app.short_name,'index.html'),'w')
