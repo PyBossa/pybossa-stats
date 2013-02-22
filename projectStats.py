@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
 
     for app in list_apps:
-        print "Generating stats for %s" % app[0].name
+        print "Generating stats for %s" % unicode(app[0].name).encode('utf-8')
         if (len(app) > 0):
             app = app[0]
             users = []
