@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+{% set placeholder = "http://crowdcrafting.org/static/img/placeholder.png" %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Stats for applications</title>
+        <!-- Google fonts -->
+        <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300' rel='stylesheet' type='text/css'>
+        <!-- Leaflet maps -->
+         <!--[if lte IE 8]>
+             <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.ie.css" />
+         <![endif]-->
+        <!-- Default Style -->
+
+        <style>
+        {% include "css/bootstrap.css" %}
+        {% include "css/stats.css" %}
+        .img-polaroid {
+            min-width: 100px;
+            min-height: 100px;
+            max-width: 100px;
+            max-height: 100px;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row-fluid">
+                <div class="span12">
+                    <h2 style="margin-left:30px;">Statistics</h2>
+                </div>
+            </div>
+            {% for app in apps %}
+            {% if app.info.thumbnail %}
+            {% set img_src = app.info.thumbnail %}
+            {% else %}
+            {% set img_src = placeholder %}
+            {% endif %}
+            <div class="row-fluid">
+                <hr>
+                <div class="span2">
+                    <a href="{{app.short_name}}/index.html">
+                        <img class="img-polaroid" src="{{img_src}}" onerror="imgError(this);">
+                    </a>
+                </div>
+                <div class="span6">
+                    <h1>{{app.name}}</h1>
+                    <h4>{{app.description}}</h4>
+                    <h5><a href="{{app.short_name}}/index.html"> Check the stats</a></h5>
+                </div>
+            </div>
+                {% endfor %}
+        </div>
+    </body>
+    <script>
+        function imgError(image) {
+            image.onerror = "";
+            image.src = "{{placeholder}}";
+            return true;
+        }
+    </script>
+</html>

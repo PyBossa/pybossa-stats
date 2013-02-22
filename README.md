@@ -33,3 +33,24 @@ name.
 You can anonymize the data if you want, by using the -p (--private) argument.
 
 If you want to see a live example of the results, [check this one](http://pybossa.github.com/pybossa-stats/)
+
+# Generating some stats and charts for a list of apps
+
+If you want to generate the stats for a given list of applications, you could
+do it by providing a file with an app short name per line:
+
+```
+  flickrperson
+  urbanparks
+  ...
+```
+
+Then, run the following command:
+
+ ```bash
+  python projectStats.py -s PYBOSSA-SERVER -k API-KEY --list-apps filename
+```
+
+And the script will generate the stats for the given list, providing an
+index.html file with an index for the apps.
+
