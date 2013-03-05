@@ -351,10 +351,16 @@ if __name__ == "__main__":
                 loc_anon = []
                 for u in c_anon_users.most_common(5):
                     loc = gic.record_by_addr(u[0])
+                    if (len(loc.keys()) == 0):
+                        loc['latitude'] = 0
+                        loc['longitude'] = 0
                     top5_anon.append(dict(ip=u[0],loc=loc, tasks=u[1]))
 
                 for u in c_anon_users.items():
                     loc = gic.record_by_addr(u[0])
+                    if (len(loc.keys()) == 0):
+                        loc['latitude'] = 0
+                        loc['longitude'] = 0
                     loc_anon.append(dict(ip=u[0],loc=loc, tasks=u[1]))
 
                 for u in c_auth_users.most_common(5):
